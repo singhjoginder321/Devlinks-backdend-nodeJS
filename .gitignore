@@ -1,0 +1,83 @@
+# Node.js dependencies
+node_modules/
+
+# Build outputs
+dist/
+build/
+out/
+
+# Environment variables
+.env
+
+# Logs
+*.log
+logs/
+pids/
+*.pid
+
+# Runtime data
+pids/
+*.pid.lock
+*.seed
+
+# Dependency directories
+jspm_packages/
+
+# VSCode settings
+.vscode/
+
+# macOS files
+.DS_Store
+
+# Windows files
+Thumbs.db
+Desktop.ini
+
+# npm and yarn lock files
+package-lock.json
+yarn.lock
+
+# Optional npm cache directory
+.npm/
+
+# Optional Yarn cache directory
+.yarn/
+
+# Optional coverage directory
+coverage/
+
+# Optional ESLint cache directory
+.eslintcache
+
+# Optional test results
+test-results/
+
+# Temporary files
+tmp/
+temp/
+
+# Docker files
+docker-compose.override.yml
+
+# IDE and editor directories
+.idea/
+*.swp
+*.swo
+*.swn
+*.sublime-workspace
+*.sublime-project
+*.project
+*.classpath
+*.settings/
+*.project
+*.classpath
+
+# System files
+*.swo
+*.swn
+
+# Environment-specific files
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
