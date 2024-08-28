@@ -1,9 +1,11 @@
-const User = require("../models/User");
-const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
-const cloudinary = require("../config/cloudinaryConfig");
+import { Request, Response } from 'express';
+import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
+import User from '../models/User';
+import cloudinary from '../config/cloudinaryConfig';
+// import { CustomRequest } from '../middleware/authMiddleware'
 
-const registerUser = async (req, res) => {
+const registerUser = async (req: Request, res: Response): Promise<any> => {
   const { name, email, password } = req.body;
 
   try {
@@ -46,27 +48,31 @@ const registerUser = async (req, res) => {
   }
 };
 
-const uploadProfilePicture = async (req, res) => {
+const uploadProfilePicture = async (req: any, res: Response): Promise<any> => {
   try {
-    const user = await User.findById(req.user.id);
+    const user = await User.findById(req.user?.id);
 
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
 
-    user.profilePicture = req.file.path;
-    await user.save();
+    if (req.file) {
+      user.profilePicture = req.file.path;
+      await user.save();
 
-    res.status(200).json({
-      message: "Profile picture uploaded successfully",
-      profilePicture: req.file.path,
-    });
+      res.status(200).json({
+        message: "Profile picture uploaded successfully",
+        profilePicture: req.file.path,
+      });
+    } else {
+      res.status(400).json({ message: "No file uploaded" });
+    }
   } catch (error) {
     res.status(500).json({ message: "Server error", error });
   }
 };
 
-const loginUser = async (req, res) => {
+const loginUser = async (req: Request, res: Response): Promise<any> => {
   try {
     const { email, password } = req.body;
 
@@ -87,8 +93,8 @@ const loginUser = async (req, res) => {
     }
 
     const accessToken = jwt.sign(
-      { id: user._id, username: user.username },
-      process.env.ACCESS_TOKEN_SECRET,
+      { id: user._id, username: user.name }, // Assuming user has 'name' not 'username'
+      process.env.ACCESS_TOKEN_SECRET as string,
       { expiresIn: "1h" }
     );
 
@@ -98,9 +104,9 @@ const loginUser = async (req, res) => {
   }
 };
 
-const getUserDetails = async (req, res) => {
+const getUserDetails = async (req: any, res: Response): Promise<any> => {
   try {
-    const user = await User.findById(req.user.id).select("-password");
+    const user = await User.findById(req.user?.id).select("-password");
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
@@ -111,7 +117,7 @@ const getUserDetails = async (req, res) => {
   }
 };
 
-const getAllUsers = async (req, res) => {
+const getAllUsers = async ( res: Response): Promise<any> => {
   try {
     const users = await User.find().select("-password");
     res.status(200).json(users);
@@ -121,11 +127,11 @@ const getAllUsers = async (req, res) => {
   }
 };
 
-const updateUserDetails = async (req, res) => {
+const updateUserDetails = async (req: any, res: Response): Promise<any> => {
   try {
     const { name, email, password } = req.body;
 
-    const user = await User.findById(req.user.id);
+    const user = await User.findById(req.user?.id);
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
@@ -145,9 +151,9 @@ const updateUserDetails = async (req, res) => {
   }
 };
 
-const deleteUser = async (req, res) => {
+const deleteUser = async (req: any, res: Response): Promise<any> => {
   try {
-    const user = await User.findByIdAndDelete(req.user.id);
+    const user = await User.findByIdAndDelete(req.user?.id);
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
@@ -159,7 +165,7 @@ const deleteUser = async (req, res) => {
   }
 };
 
-module.exports = {
+export {
   registerUser,
   uploadProfilePicture,
   loginUser,

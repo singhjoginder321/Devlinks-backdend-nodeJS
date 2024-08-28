@@ -1,9 +1,9 @@
-const winston = require("winston");
-const path = require("path");
-const fs = require("fs");
+import winston from 'winston';
+import path from 'path';
+import fs from 'fs';
 
 // Define the logs directory
-const logDir = path.join(__dirname, "logs");
+const logDir = path.join(__dirname, 'logs');
 
 // Check if the logs directory exists, and if not, create it
 if (!fs.existsSync(logDir)) {
@@ -12,26 +12,26 @@ if (!fs.existsSync(logDir)) {
 
 // Create a new logger instance
 const logger = winston.createLogger({
-  level: "info", // Set the logging level
+  level: 'info', // Set the logging level
   format: winston.format.combine(
-    winston.format.timestamp({ format: "YYYY-MM-DD HH:mm:ss" }),
+    winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
     winston.format.printf(
       (info) => `${info.timestamp} ${info.level}: ${info.message}`
     )
   ),
   transports: [
     new winston.transports.File({
-      filename: path.join(logDir, "combined.log"),
+      filename: path.join(logDir, 'combined.log'),
     }),
     new winston.transports.File({
-      filename: path.join(logDir, "error.log"),
-      level: "error",
+      filename: path.join(logDir, 'error.log'),
+      level: 'error',
     }),
   ],
 });
 
 // If we're not in production, log to the console
-if (process.env.NODE_ENV !== "production") {
+if (process.env.NODE_ENV !== 'production') {
   logger.add(
     new winston.transports.Console({
       format: winston.format.simple(),
@@ -39,4 +39,4 @@ if (process.env.NODE_ENV !== "production") {
   );
 }
 
-module.exports = logger;
+export default logger;
