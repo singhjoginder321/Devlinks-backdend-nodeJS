@@ -97,7 +97,7 @@ const getLinksByUserId = async (req: Request, res: Response): Promise<any> => {
 };
 
 
-const shareLink = async (req: Request, res: Response): Promise<any> => {
+const shareLink = async (req: any, res: Response): Promise<any> => {
   const { recipientEmail } = req.body;
   const userId = req.user?.id;
   console.log(req.body);
