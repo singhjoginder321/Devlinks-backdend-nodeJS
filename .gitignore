@@ -34,7 +34,6 @@ Thumbs.db
 Desktop.ini
 
 # npm and yarn lock files
-package-lock.json
 yarn.lock
 
 # Optional npm cache directory
