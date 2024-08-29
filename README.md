@@ -69,7 +69,7 @@ Make sure to replace the placeholders with actual values. For example, provide y
 If your project uses Docker Compose, you can start the application with a single command. Ensure you have a `docker-compose.yml` file in the root of your project directory, then run:
 
 ```bash
-docker-compose up
+docker-compose up --build
 ```
 
 This command will build the image and start the container as defined in your `docker-compose.yml` file.
