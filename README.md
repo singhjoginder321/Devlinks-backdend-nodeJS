@@ -34,7 +34,36 @@ MAIL_PASS=
 MAIL_USER=
 MAIL_HOST=smtp.gmail.com
 MAIL_SECURE=
+PG_HOST=localhost
+PG_USER=your_username
+PG_PASSWORD=your_password
+PG_DATABASE=your_database
+PG_PORT=5432
 ```
+
+## Running Migrations
+
+To apply all database migrations in the development environment, use the following command:
+
+```bash
+npx knex migrate:latest --env development
+```
+
+This command will apply all pending migrations to the PostgreSQL database as defined in your `knexfile.js`.
+
+## Seeding the Database
+
+After running migrations, you can seed your database with sample data. To run all seed files in the `seeds` directory, use:
+
+```bash
+npx knex seed:run --env development
+```
+
+This command will execute all seed files, inserting sample data into your tables.
+
+### Running Specific Seed Files
+
+If you need to run a specific seed file, you need to manage the seed files manually by ensuring they are ordered correctly and named appropriately with prefixes (e.g., `01_users_seed.js`, `02_links_seed.js`). Knex does not support running individual seed files directly.
 
 Make sure to replace the placeholders with actual values. For example, provide your MongoDB URI, Cloudinary credentials, and email configuration.
 

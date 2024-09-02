@@ -13,8 +13,8 @@ router.post('/register', upload.single('profilePicture'), registerUser);
 
 const log = (req:Request,res:Response,next:NextFunction) =>{
   console.log('Authentication middleware triggered');
-  console.log(req);
-  console.log(res);
+  // console.log(req);
+  // console.log(res);
   next();
   // Add your own authentication logic here
   // For example, you can check if the token is valid and authorized to access the route

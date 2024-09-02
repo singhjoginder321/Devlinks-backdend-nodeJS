@@ -17,13 +17,13 @@ const authenticateToken = (
 ): any => {
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(' ')[1]; // Extract token from 'Bearer [token]'
-
+  // console.log(token);
   if (!token) return res.sendStatus(401); // No token provided
 
   jwt.verify(token, process.env.JWT_SECRET as string, (err, user):any => {
     if (err) return res.sendStatus(403); // Invalid token
 
-    console.log('User from JWT:', user);
+    // console.log('User from JWT:', user);
     req.user = user; // Attach user to the request object
     next(); // Proceed to the next middleware or route handler
   });

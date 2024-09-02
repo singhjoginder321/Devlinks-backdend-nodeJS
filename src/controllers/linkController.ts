@@ -1,13 +1,12 @@
 import { Request, Response } from 'express';
-import Link from '../models/Link';
-import User from '../models/User';
 import shareLinkTemplate from '../tempelate/mail/shareLinkTempelate';
 import mailSender from '../utils/mailSender';
-// import { any } from '../middleware/authMiddleware'; // Import the any interface if you have it
+import query from '../utils/query'; // Updated import
 
 const getAllLinks = async (req: any, res: Response): Promise<any> => {
   try {
-    const links = await Link.find({ userId: req.user?.id });
+    const userId = req.user?.id;
+    const { rows: links } = await query('SELECT * FROM links WHERE user_id = $1', [userId]);
     res.status(200).json(links);
   } catch (error) {
     res.status(500).json({ message: "Server error", error });
@@ -17,25 +16,19 @@ const getAllLinks = async (req: any, res: Response): Promise<any> => {
 const addLink = async (req: any, res: Response): Promise<any> => {
   try {
     const { platform, link } = req.body;
+    const userId = req.user?.id;
 
     if (!platform || !link) {
       return res.status(400).json({ message: "Platform and URL are required" });
     }
 
-    // Debugging: log request body
-    console.log("Request Body:", req.body);
-    console.log("User ID:", req.user);
+    await query(
+      'INSERT INTO links (platform, link, user_id) VALUES ($1, $2, $3)',
+      [platform, link, userId]
+    );
 
-    const newLink = new Link({
-      platform,
-      link,
-      userId: req.user?.id, // Assuming user is authenticated and user ID is available
-    });
-
-    await newLink.save();
     res.status(201).json({ message: "Link added successfully" });
   } catch (error) {
-    // Log detailed error information
     console.error("Error:", error);
     res.status(500).json({ message: "Server error", error });
   }
@@ -45,17 +38,23 @@ const updateLink = async (req: any, res: Response): Promise<any> => {
   try {
     const { id } = req.params;
     const { platform, link } = req.body;
+    const userId = req.user?.id;
 
-    const linkInDb = await Link.findOne({ _id: id, userId: req.user?.id });
-    if (!linkInDb) {
+    const { rows: linkInDb } = await query(
+      'SELECT * FROM links WHERE link_id = $1 AND user_id = $2',
+      [id, userId]
+    );
+
+    if (linkInDb.length === 0) {
       return res.status(404).json({ message: "Link not found" });
     }
 
-    linkInDb.platform = platform || linkInDb.platform;
-    linkInDb.link = link || linkInDb.link;
+    await query(
+      'UPDATE links SET platform = $1, link = $2 WHERE link_id = $3 AND user_id = $4',
+      [platform || linkInDb[0].platform, link || linkInDb[0].link, id, userId]
+    );
 
-    await linkInDb.save();
-    res.status(200).json(linkInDb);
+    res.status(200).json({ message: "Link updated successfully" });
   } catch (error) {
     res.status(500).json({ message: "Server error", error });
   }
@@ -64,9 +63,14 @@ const updateLink = async (req: any, res: Response): Promise<any> => {
 const deleteLink = async (req: any, res: Response): Promise<any> => {
   try {
     const { id } = req.params;
+    const userId = req.user?.id;
 
-    const link = await Link.findOneAndDelete({ _id: id, userId: req.user?.id });
-    if (!link) {
+    const { rowCount } = await query(
+      'DELETE FROM links WHERE link_id = $1 AND user_id = $2',
+      [id, userId]
+    );
+
+    if (rowCount === 0) {
       return res.status(404).json({ message: "Link not found" });
     }
 
@@ -76,64 +80,60 @@ const deleteLink = async (req: any, res: Response): Promise<any> => {
   }
 };
 
-// Get all links by userId from the request params
 const getLinksByUserId = async (req: Request, res: Response): Promise<any> => {
   try {
-    const { id } = req.params; // Extract the link ID from the request parameters
-    console.log(id);
+    const { id } = req.params;
 
-    // Fetch the link associated with the linkId
-    const link = await Link.findById(id);
+    const { rows: links } = await query('SELECT * FROM links WHERE user_id = $1', [id]);
 
-    if (!link) {
-      return res.status(404).json({ message: "Link not found" });
+    if (links.length === 0) {
+      return res.status(404).json({ message: "No links found for this user" });
     }
 
-    // Return the link as a response
-    res.status(200).json(link);
-  } catch (error:any) {
-    res.status(500).json({ message: "Error fetching link", error: error.message });
+    res.status(200).json(links);
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching links", error: error.message });
   }
 };
-
 
 const shareLink = async (req: any, res: Response): Promise<any> => {
   const { recipientEmail } = req.body;
   const userId = req.user?.id;
-  console.log(req.body);
-  console.log(userId, recipientEmail);
 
   try {
-    // Validate input
     if (!userId || !recipientEmail) {
       return res.status(400).json({ message: "User ID and recipient email are required" });
     }
 
     // Find the user
-    const userDetails = await User.findById(userId);
-    if (!userDetails) {
+    const { rows: userDetails } = await query('SELECT * FROM users WHERE user_id = $1', [userId]);
+    if (userDetails.length === 0) {
       return res.status(404).json({ message: "User not found" });
     }
+    const user = userDetails[0];
 
     // Find links associated with the user
-    const links = await Link.find({ userId });
+    const { rows: links } = await query('SELECT * FROM links WHERE user_id = $1', [userId]);
 
     // Create email content
-    const { name, email, profilePicture } = userDetails;
+    const { name, email, profile_picture: profilePicture } = user;
     const subject = 'User Details';
     const body = shareLinkTemplate(name, email, profilePicture || '', links);
 
     // Send email
     const emailSent = await mailSender(recipientEmail, subject, body);
 
-    return res.status(200).json({ message: "Email sent successfully", success: emailSent});
+    return res.status(200).json({ message: "Email sent successfully", success: emailSent });
   } catch (error) {
     console.error("Error:", error);
     return res.status(500).json({ message: "Server error", error });
   }
 };
 
-
 export {
-  addLink, deleteLink, getAllLinks, getLinksByUserId, updateLink, shareLink
+  addLink,
+  deleteLink,
+  getAllLinks,
+  getLinksByUserId, shareLink, updateLink
 };
+

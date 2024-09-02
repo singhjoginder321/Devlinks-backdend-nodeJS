@@ -9,6 +9,7 @@ import authRoutes from "./routes/authRoutes";
 import linkRoutes from "./routes/linkRoutes";
 import userRoutes from "./routes/userRoutes";
 import logger from "./utils/logger";
+import client from "./config/db";
 
 dotenv.config();
 
@@ -22,7 +23,12 @@ app.use(cors());
 app.use(bodyParser.json());
 
 // Connect to MongoDB
-connectDB();
+// connectDB();
+
+//making connection to Postgres
+client.connect()
+  .then(() => console.log('Database connected successfully'))
+  .catch(err => console.error('Connection error', err.stack));
 
 app.get("/", (_req:Request, res: Response):any => {
   logger.info("Home route accessed");

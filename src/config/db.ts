@@ -1,24 +1,15 @@
-import mongoose from 'mongoose';
+// config/db.ts
 import dotenv from 'dotenv';
+import { Client } from 'pg';
 
 dotenv.config();
 
-const connectDB = async (): Promise<void> => {
-  try {
-    // Check if URI is defined and valid
-    const mongoURI = process.env.MONGO_URI;
-    if (!mongoURI) {
-      throw new Error('MONGO_URI is not defined in the environment variables.');
-    }
+const client = new Client({
+  user: process.env.PG_USER || 'defaultUser',
+  host: process.env.PG_HOST || 'localhost',
+  database: process.env.PG_DATABASE || 'defaultDatabase',
+  password: process.env.PG_PASSWORD || 'defaultPassword',
+  port: parseInt(process.env.PG_PORT || '5432', 1234),
+});
 
-    // Connect to MongoDB without deprecated options
-    await mongoose.connect(mongoURI);
-
-    console.log('MongoDB connected successfully!');
-  } catch (error) {
-    console.error('Error connecting to MongoDB:', (error as Error).message);
-    process.exit(1); // Exit the process with failure
-  }
-};
-
-export default connectDB;
+export default client;

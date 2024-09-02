@@ -7,7 +7,8 @@
     "build": "tsc",
     "start": "tsc && nodemon dist/server.js",
     "dev": "concurrently \"tsc -w\" \"nodemon dist/server.js\"",
-    "prestart": "npm run build"
+    "migrate": "knex migrate:latest --env development",
+    "seed": "knex seed:run --env development"
   },
   "keywords": [],
   "author": "",
@@ -23,11 +24,13 @@
     "express": "^4.19.2",
     "express-validator": "^7.2.0",
     "jsonwebtoken": "^9.0.2",
+    "knex": "^3.1.0",
     "mongoose": "^8.5.3",
     "multer": "^1.4.5-lts.1",
     "multer-storage-cloudinary": "^4.0.0",
     "nodemailer": "^6.9.14",
     "otp-generator": "^4.0.1",
+    "pg": "^8.12.0",
     "winston": "^3.14.2"
   },
   "devDependencies": {
@@ -42,6 +45,7 @@
     "@types/node": "^22.5.0",
     "@types/nodemailer": "^6.4.15",
     "@types/otp-generator": "^4.0.2",
+    "@types/pg": "^8.11.8",
     "@types/winston": "^2.4.4",
     "concurrently": "^8.2.2",
     "nodemon": "^3.1.4",

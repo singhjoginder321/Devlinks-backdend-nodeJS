@@ -1,5 +1,5 @@
-import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
+import jwt from 'jsonwebtoken';
 
 dotenv.config();
 
@@ -15,7 +15,7 @@ dotenv.config();
  */
 const generateToken = (user:any): string => {
   return jwt.sign(
-    { id: user._id, username: user.username }, // Payload to be encoded in the token
+    { id: user.user_id, username: user.name }, // Payload to be encoded in the token
     process.env.JWT_SECRET as string, // Secret key for signing the token
     { expiresIn: '1h' } // Token expiration time
   );
