@@ -1,0 +1,88 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: devlinks-backend
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: devlinks-backend
+  template:
+    metadata:
+      labels:
+        app: devlinks-backend
+    spec:
+      containers:
+        - name: devlinks-backend
+          image: singhjoginder321/devlinks-backend:v1
+          ports:
+            - containerPort: 8081
+          env:
+            - name: PORT
+              value: "8001"
+            - name: MONGO_URI
+              valueFrom:
+                secretKeyRef:
+                  name: app-secrets
+                  key: mongo_uri
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: app-secrets
+                  key: jwt_secret
+            - name: CLOUDINARY_CLOUD_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: app-secrets
+                  key: cloudinary_cloud_name
+            - name: CLOUDINARY_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: app-secrets
+                  key: cloudinary_api_key
+            - name: CLOUDINARY_API_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: app-secrets
+                  key: cloudinary_api_secret
+            - name: NODE_ENV
+              value: "false"
+            - name: MAIL_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: app-secrets
+                  key: mail_pass
+            - name: MAIL_USER
+              valueFrom:
+                secretKeyRef:
+                  name: app-secrets
+                  key: mail_user
+            - name: MAIL_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: app-secrets
+                  key: mail_host
+            - name: MAIL_SECURE
+              valueFrom:
+                secretKeyRef:
+                  name: app-secrets
+                  key: mail_secure
+            - name: PG_USER
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secrets
+                  key: pg_user
+            - name: PG_HOST
+              value: postgres-service
+            - name: PG_DATABASE
+              valueFrom:
+                configMapKeyRef:
+                  name: postgres-config
+                  key: pg_database
+            - name: PG_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secrets
+                  key: pg_password
+            - name: PG_PORT
+              value: "5432"
