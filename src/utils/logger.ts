@@ -1,6 +1,7 @@
-import winston from 'winston';
-import path from 'path';
 import fs from 'fs';
+import path from 'path';
+import winston from 'winston';
+import LokiTransport from 'winston-loki'; // Import winston-loki
 
 // Define the logs directory
 const logDir = path.join(__dirname, 'logs');
@@ -26,6 +27,11 @@ const logger = winston.createLogger({
     new winston.transports.File({
       filename: path.join(logDir, 'error.log'),
       level: 'error',
+    }),
+    // Add Loki transport
+    new LokiTransport({
+      host: 'http://localhost:3100', // URL of your Loki instance
+      labels: { job: 'nodejs-application' }, // Labels for logs
     }),
   ],
 });

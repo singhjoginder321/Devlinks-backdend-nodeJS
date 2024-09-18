@@ -7,6 +7,9 @@ import jwt from 'jsonwebtoken';
 import otpGenerator from 'otp-generator';
 import cloudinary from '../config/cloudinaryConfig';
 import emailVerificationTemplate from '../tempelate/mail/emailVerificationTemplate';
+//import generateToken from '../utils/generateToken';
+import axios from 'axios';
+import User from '../models/User';
 import generateToken from '../utils/generateToken';
 import mailSender from '../utils/mailSender';
 import query from '../utils/query'; // Updated import
@@ -198,9 +201,23 @@ const resetPassword = async (req: Request, res: Response) => {
   }
 };
 
+// Generate a JWT token
+// const generateToken = (user: any) => {
+//   console.log("inside Generate Token");
+//   console.log("user", user);
+//   return jwt.sign(
+//     { id: user._id, email: user.email },
+//     process.env.JWT_SECRET!,
+//     { expiresIn: '1h' } // Adjust the expiration time as needed
+//   );
+// };
+
+
+
+
+
 export {
-  authenticateToken,
-  loginUser,
+  authenticateToken, googleCallback, loginUser,
   logoutUser,
   registerUser,
   resetPassword,

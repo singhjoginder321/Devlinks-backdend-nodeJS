@@ -50,4 +50,19 @@ CREATE TABLE users (
 );
 
 
+-- for Oauth
+CREATE TABLE users (
+    user_id SERIAL PRIMARY KEY,                -- Unique identifier for each user
+    name VARCHAR(255),                -- User's name
+    email VARCHAR(255) UNIQUE,        -- User's email address
+    profile_picture TEXT,  
+    password TEXT,
+    reset_password_expires VARCHAR(255),
+    reset_password_token VARCHAR(255),            -- OAuth provider (e.g., 'google', 'github')
+    oauth_id VARCHAR(255),    -- Unique ID from OAuth provider                    -- URL or path to the user's profile picture
+    provider VARCHAR(50)
+);
+
+
+
 

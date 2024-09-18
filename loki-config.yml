@@ -1,0 +1,41 @@
+server:
+  http_listen_port: 3100
+  log_level: info
+
+ingester:
+  chunk_idle_period: 5m
+  chunk_block_size: 262144
+  max_chunk_age: 1h
+  flush_checkpoint: 10s
+  flush_deadline: 1m
+
+storage_config:
+  boltdb:
+    directory: /loki/index
+  filesystem:
+    directory: /loki/chunks
+
+limits_config:
+  enforce_metric_name: false
+  ingestion_rate_mb: 10
+  max_entries_limit: 50000
+
+schema_config:
+  configs:
+    - from: 2020-01-01
+      store: boltdb
+      object_store: filesystem
+      schema: v11
+      index:
+        prefix: index_
+        period: 24h
+
+compactor:
+  working_directory: /loki/compactor
+  shared_store: filesystem
+
+ruler:
+  storage:
+    boltdb:
+      directory: /loki/ruler/index
+  enable_api: true

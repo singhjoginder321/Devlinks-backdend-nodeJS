@@ -1,9 +1,9 @@
-import express, { NextFunction, Router,Request,Response} from 'express';
+import express, { NextFunction, Request, Response, Router } from 'express';
 // import multer from 'multer';
+import passport from 'passport';
 import upload from '../config/multerConfig';
-import { authenticateToken, loginUser, logoutUser, registerUser } from '../controllers/authController';
-import { sendotp } from '../controllers/authController';
-import {resetPassword} from '../controllers/authController';
+import { authenticateToken, loginUser, logoutUser, registerUser, resetPassword, sendotp } from '../controllers/authController';
+import generateToken from '../utils/generateToken';
 
 const router: Router = express.Router();
 //const upload: multer.Multer = multer(); // Adjust multer configuration as needed
@@ -36,6 +36,49 @@ router.post("/sendotp", sendotp);
 
 // Route for resetting user's password after verification
 router.post("/reset-password", resetPassword);
+// Google OAuth
+router.get('/google',
+  passport.authenticate('google', {
+    scope: ['profile', 'email']
+  })
+);
+
+router.get('/google/callback', async (req, res, next) => {
+  passport.authenticate('google', { session: false }, async (error, user, info) => {
+    if (error || !user) {
+      return res.redirect('http://localhost:5173/login-signup'); // Handle failure
+    }
+
+    // Generate the JWT token
+    const token = generateToken(user);
+
+    // Send the token to the frontend
+    return res.redirect(`http://localhost:5173/Oauth?token=${token}`);
+  })(req, res, next);
+});
+
+
+// GitHub OAuth
+router.get('/github',
+  passport.authenticate('github', {
+    scope: ['user:email']
+  })
+);
+
+router.get('/github/callback', async (req, res, next) => {
+  passport.authenticate('github', { session: false }, async (error:any, user:any, info:any) => {
+    if (error || !user) {
+      return res.redirect('http://localhost:5173/login-signup'); // Handle failure
+    }
+
+    // Generate the JWT token
+    const token = generateToken(user);
+
+    // Send the token to the frontend
+    return res.redirect(`http://localhost:5173/Oauth?token=${token}`);
+  })(req, res, next);
+});
+
 
 // Middleware to authenticate the user
 router.use(authenticateToken);
